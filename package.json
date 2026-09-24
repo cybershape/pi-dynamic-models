@@ -1,0 +1,54 @@
+{
+  "name": "pi-dynamic-providers",
+  "version": "0.0.1",
+  "description": "Pi extension to dynamically discover and register models from OpenAI-compatible endpoints",
+  "author": "cybershape",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cybershape/pi-dynamic-models.git"
+  },
+  "homepage": "https://github.com/cybershape/pi-dynamic-models#readme",
+  "bugs": {
+    "url": "https://github.com/cybershape/pi-dynamic-models/issues"
+  },
+  "type": "module",
+  "main": "./src/dynamic-models.ts",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "pi",
+    "models",
+    "dynamic-models",
+    "provider",
+    "openai-compatible",
+    "pi-coding-agent"
+  ],
+  "files": [
+    "LICENSE",
+    "README.md",
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck",
+    "prepublishOnly": "npm run check"
+  },
+  "pi": {
+    "extensions": [
+      "./src/dynamic-models.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^0.80.3",
+    "@types/node": "^22.13.9",
+    "typescript": "^5.8.2"
+  }
+}
