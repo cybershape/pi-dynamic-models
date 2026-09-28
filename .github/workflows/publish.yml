@@ -10,6 +10,8 @@ on:
 
 permissions:
   contents: read
+  # Required: lets GitHub issue the OIDC token that npm exchanges for a
+  # short-lived publish credential (npm trusted publishing).
   id-token: write
 
 jobs:
@@ -23,7 +25,34 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: "https://registry.npmjs.org"
+          # Do NOT set `registry-url` here. It makes setup-node write
+          # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}` into .npmrc.
+          # npm then thinks auth is already configured (even with an empty
+          # value) and never performs the OIDC exchange, failing ENEEDAUTH.
+          # See actions/setup-node#1551.
+
+      - name: Upgrade npm
+        # Trusted publishing requires npm CLI >= 11.5.1; Node 22 ships npm 10,
+        # which has no OIDC exchange support and just falls back to "no auth".
+        run: npm install -g npm@11
+
+      - name: Verify trusted publishing prerequisites
+        run: |
+          echo "node $(node --version)"
+          echo "npm $(npm --version)"
+          npmrc="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+          if [ -f "$npmrc" ] && grep -q "_authToken" "$npmrc"; then
+            echo "::error::$npmrc still contains an _authToken entry; npm would skip the OIDC exchange."
+            exit 1
+          fi
+          if [ -n "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "::error::NODE_AUTH_TOKEN is set; npm would use it instead of OIDC."
+            exit 1
+          fi
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ]; then
+            echo "::error::ACTIONS_ID_TOKEN_REQUEST_URL is missing, so id-token: write is not in effect."
+            exit 1
+          fi
 
       - name: Install dependencies
         run: npm ci
@@ -32,6 +61,6 @@ jobs:
         run: npm run check
 
       - name: Publish to npm
+        # No NODE_AUTH_TOKEN: npm authenticates via the OIDC trusted publisher
+        # configured for cybershape/pi-dynamic-models + publish.yml on npmjs.com.
         run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
