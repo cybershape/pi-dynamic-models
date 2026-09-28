@@ -19,6 +19,8 @@ interface RemoteModelItem {
   context_length?: number;
   reasoning_efforts?: Array<{ value: string }>;
   supported_in_api?: boolean;
+  /** Backend used by the upstream gateway, e.g. "responses" or "chat_completions". */
+  api_backend?: string;
 }
 
 /**
@@ -83,11 +85,15 @@ async function syncModels(pi: ExtensionAPI): Promise<number> {
           (m.name ? m.name.toLowerCase().includes("thinking") : false);
 
         const contextWindow = m.context_window || m.context_length || defaultContextWindow;
+        const useResponsesApi = (m.api_backend || "").toLowerCase() === "responses";
 
         return {
           id: m.id,
           name: m.name || m.id,
           reasoning: isReasoning,
+          // Model-level override: upstream gateways that are backed by the Responses API
+          // must be called via /responses instead of /chat/completions.
+          ...(useResponsesApi && { api: "openai-responses" }),
           ...(isReasoning && {
             thinkingLevelMap: {
               xhigh: "xhigh",
