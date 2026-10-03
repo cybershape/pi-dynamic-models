@@ -79,27 +79,20 @@ async function syncModels(pi: ExtensionAPI): Promise<number> {
     const models = rawList
       .filter((m) => m.supported_in_api !== false)
       .map((m) => {
-        const isReasoning =
-          (Array.isArray(m.reasoning_efforts) && m.reasoning_efforts.length > 0) ||
-          m.id.toLowerCase().includes("thinking") ||
-          (m.name ? m.name.toLowerCase().includes("thinking") : false);
-
         const contextWindow = m.context_window || m.context_length || defaultContextWindow;
         const useResponsesApi = (m.api_backend || "").toLowerCase() === "responses";
 
         return {
           id: m.id,
           name: m.name || m.id,
-          reasoning: isReasoning,
+          reasoning: true,
           // Model-level override: upstream gateways that are backed by the Responses API
           // must be called via /responses instead of /chat/completions.
           ...(useResponsesApi && { api: "openai-responses" }),
-          ...(isReasoning && {
-            thinkingLevelMap: {
-              xhigh: "xhigh",
-              max: "max",
-            },
-          }),
+          thinkingLevelMap: {
+            xhigh: "xhigh",
+            max: "max",
+          },
           input: ["text", "image"] as ("text" | "image")[],
           cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
           contextWindow,

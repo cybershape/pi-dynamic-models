@@ -9,7 +9,7 @@ A [Pi coding agent](https://pi.dev) extension to automatically discover and regi
 ## Features
 
 - **Dynamic Model Discovery**: Queries the `/models` endpoint at startup and dynamically registers available models with the Pi provider registry.
-- **Reasoning Model Support**: Automatically detects reasoning/thinking models (via `reasoning_efforts` metadata or naming heuristics) and sets up appropriate thinking levels.
+- **Reasoning Model Support**: Enables reasoning support for models with configurable thinking levels up to `max`.
 - **Manual Hot-Reload**: Provides a `/refresh-models` command to reload the remote model catalog without restarting Pi.
 - **Flexible Configuration**: Reads configuration from `~/.pi/agent/dynamic-models/config.json`.
 
