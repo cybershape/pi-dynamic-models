@@ -1,6 +1,6 @@
 {
   "name": "pi-dynamic-providers",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Pi extension to dynamically discover and register models from OpenAI-compatible endpoints",
   "author": "cybershape",
   "license": "MIT",

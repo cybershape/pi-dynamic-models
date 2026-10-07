@@ -21,6 +21,7 @@ interface RemoteModelItem {
   supported_in_api?: boolean;
   /** Backend used by the upstream gateway, e.g. "responses" or "chat_completions". */
   api_backend?: string;
+  native_endpoints?: string[];
 }
 
 /**
@@ -80,7 +81,9 @@ async function syncModels(pi: ExtensionAPI): Promise<number> {
       .filter((m) => m.supported_in_api !== false)
       .map((m) => {
         const contextWindow = m.context_window || m.context_length || defaultContextWindow;
-        const useResponsesApi = (m.api_backend || "").toLowerCase() === "responses";
+        const useResponsesApi =
+          (m.api_backend || "").toLowerCase() === "responses" ||
+          (m.native_endpoints && m.native_endpoints.includes("/v1/responses"));
 
         return {
           id: m.id,
