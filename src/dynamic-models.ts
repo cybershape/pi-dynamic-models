@@ -105,6 +105,7 @@ async function syncModels(pi: ExtensionAPI): Promise<number> {
           // Without this, reasoning models may send system prompts with developer role and be rejected upstream.
           compat: {
             supportsDeveloperRole: false,
+            sendSessionAffinityHeaders: true,
           },
         };
       });
